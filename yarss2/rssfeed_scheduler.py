@@ -37,16 +37,17 @@ class RSSFeedScheduler(object):
         """Creates the LoopingCall timers, one for each RSS Feed"""
         config = self.yarss_config.get_config()
         for key in config["rssfeeds"]:
-            self.set_timer(config["rssfeeds"][key]["key"], config["rssfeeds"][key]['update_interval'])
+            rssfeed = config["rssfeeds"][key]
+            self.set_timer(rssfeed["key"], rssfeed['update_interval'], rssfeed["update_on_startup"])
             self.log.info("Scheduled RSS Feed '%s' with interval %s" %
-                          (config["rssfeeds"][key]["name"], config["rssfeeds"][key]["update_interval"]))
+                          (rssfeed["name"], rssfeed["update_interval"]))
 
     def disable_timers(self):
         for key in self.rssfeed_timers.keys():
             self.rssfeed_timers[key]["timer"].stop()
             del self.rssfeed_timers[key]
 
-    def set_timer(self, key, interval):
+    def set_timer(self, key, interval, update_on_startup):
         """Schedule a timer for the specified interval."""
         try:
             interval = int(interval)
@@ -66,11 +67,12 @@ class RSSFeedScheduler(object):
             # Second argument, the rssfeedkey is passed as argument to the callback method
             timer = LoopingCall(self.queue_rssfeed_update, key)
             self.rssfeed_timers[key] = {"timer": timer, "update_interval": interval}
-        self.rssfeed_timers[key]["timer"].start(interval * 60, now=False)  # Multiply to get seconds
+        self.rssfeed_timers[key]["timer"].start(interval * 60, now=update_on_startup)  # Multiply to get seconds
         return True
 
     def delete_timer(self, key):
         """Delete timer with the specified key."""
+        print "Delete timer"
         if key not in self.rssfeed_timers:
             self.log.warn("Cannot delete timer. No timer with key %s" % key)
             return False
