@@ -47,7 +47,7 @@ class RSSFeedScheduler(object):
             self.rssfeed_timers[key]["timer"].stop()
             del self.rssfeed_timers[key]
 
-    def set_timer(self, key, interval, update_on_startup):
+    def set_timer(self, key, interval, update_on_startup=False):
         """Schedule a timer for the specified interval."""
         try:
             interval = int(interval)
@@ -118,9 +118,11 @@ class RSSFeedScheduler(object):
                 rssfeed_key = self.yarss_config.get_config()["subscriptions"][subscription_key]["rssfeed_key"]
             self.log.info("Rescheduling RSS Feed '%s' with interval '%s' according to TTL." %
                           (self.yarss_config.get_config()["rssfeeds"][rssfeed_key]["name"], fetch_result["ttl"]))
-            self.set_timer(rssfeed_key, fetch_result["ttl"])
+            rssfeed = self.yarss_config.get_config()["rssfeeds"][rssfeed_key]
             # Set new interval in config
-            self.yarss_config.get_config()["rssfeeds"][rssfeed_key]["update_interval"] = fetch_result["ttl"]
+            rssfeed["update_interval"] = fetch_result["ttl"]
+            # Reschedule timer
+            self.set_timer(rssfeed_key, fetch_result["ttl"], rssfeed["update_on_startup"])
         # Send YARSSConfigChangedEvent to GUI with updated config.
         try:
             # Tests throws KeyError for EventManager when running this method, so wrap this in try/except
