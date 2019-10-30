@@ -5,6 +5,7 @@
   <object class="GtkDialog" id="dialog_email_message">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
+    <property name="modal">True</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
     <signal name="response" handler="on_dialog_email_message_response" swapped="no"/>

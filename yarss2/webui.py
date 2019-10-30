@@ -13,15 +13,25 @@
 
 from __future__ import unicode_literals
 
-import logging
-
 from deluge.plugins.pluginbase import WebPluginBase
+from deluge.ui.web.json_webapi import WebapiNamespace
+
+from yarss2.util import logging
 
 from .util.common import get_resource
 
 log = logging.getLogger(__name__)
 
+webapi_ns = WebapiNamespace("YaRSS2")
 
-class WebUI(WebPluginBase):
+
+class YaRSS2(WebPluginBase):
     scripts = [get_resource('yarss2.js')]
     debug_scripts = scripts
+
+    def __init__(self, name):
+        super(YaRSS2, self).__init__(name)
+
+    @webapi_ns.get
+    def skrot(self):
+        return "SKROT"

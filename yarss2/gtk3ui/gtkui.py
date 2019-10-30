@@ -31,6 +31,7 @@ from .dialog_cookie import DialogCookie
 from .dialog_email_message import DialogEmailMessage
 from .dialog_rssfeed import DialogRSSFeed
 from .dialog_subscription import DialogSubscription
+from .common import show_message_dialog
 
 
 class GtkUI(Gtk3PluginBase):
@@ -43,6 +44,7 @@ class GtkUI(Gtk3PluginBase):
         client.register_event_handler("PluginEnabledEvent", self.plugins_enabled_changed)
         client.register_event_handler("PluginDisabledEvent", self.plugins_enabled_changed)
         self.plugins_enabled_changed("Label")
+        self.subscription_dialogs = {}
 
     def disable(self):
         component.get("Preferences").remove_page("YaRSS2")
@@ -712,15 +714,13 @@ class GtkUI(Gtk3PluginBase):
 # SUBSCRIPTION callbacks
 #############################
 
+    def show_message_dialog(self, msg):
+        show_message_dialog(component.get("Preferences").pref_dialog, msg)
+
     def on_button_add_subscription_clicked(self, event=None, a=None, col=None):
         # Check if any RSS Feeds exists, if not, show popup
         if len(self.rssfeeds.keys()) == 0:
-            md = Gtk.MessageDialog(component.get("Preferences").pref_dialog,
-                                   Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
-                                   Gtk.ButtonsType.CLOSE,
-                                   "You need to add a RSS Feed before creating subscriptions!")
-            md.run()
-            md.destroy()
+            self.show_message_dialog("You need to add a RSS Feed before creating subscriptions!")
             return
 
         fresh_subscription_config = yarss_config.get_fresh_subscription_config()
@@ -753,9 +753,24 @@ class GtkUI(Gtk3PluginBase):
         if key:
             self.save_subscription(None, subscription_key=key, delete=True)
 
-    def on_button_edit_subscription_clicked(self, event=None, a=None, col=None):
+    def on_button_edit_subscription_clicked(self, event_widget=None, treepath=None, col=None):
+        """
+        Args:
+            event_widget (Gtk widget): The Gtk widget that caused the event
+            treepath (Gtk.TreePath): A treepath if event_widget is Gtk.TreeView
+            col (Gtk.TreeViewColumn): A treeviewcolumn if event_widget is Gtk.TreeView
+        """
         key = get_value_in_selected_row(self.subscriptions_treeview, self.subscriptions_store)
+
         if key:
+            # A dialog with this key is already open
+            if key in self.subscription_dialogs:
+                log.info("A subscription dailog with key %s already open", key)
+                # Show the existing dialog
+                dialog = self.subscription_dialogs[key]
+                dialog.dialog.present_with_time(Gtk.get_current_event_time())
+                return
+
             if col and col.get_title() == 'Active':
                 self.subscriptions[key]["active"] = not self.subscriptions[key]["active"]
                 self.save_subscription(self.subscriptions[key])
@@ -767,6 +782,12 @@ class GtkUI(Gtk3PluginBase):
                                                               self.email_messages,
                                                               self.cookies)
                 edit_subscription_dialog.show()
+                self.subscription_dialogs[key] = edit_subscription_dialog
+
+    def subscription_dialog_closed(self, key):
+        self.log.debug("subscription dialog (key: %s) closed", key)
+        if key in self.subscription_dialogs:
+            del self.subscription_dialogs[key]
 
     def on_subscription_listitem_activated(self, treeview):
         tree, tree_id = self.subscriptions_treeview.get_selection().get_selected()
@@ -796,12 +817,7 @@ class GtkUI(Gtk3PluginBase):
 
         # Any registered subscriptions?
         if sum(feed_subscriptions[key]) > 0:
-            md = Gtk.MessageDialog(component.get("Preferences").pref_dialog,
-                                   Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
-                                   Gtk.ButtonsType.CLOSE,
-                                   "This RSS Feed have subscriptions registered. Delete subscriptions first!")
-            md.run()
-            md.destroy()
+            self.show_message_dialog("This RSS Feed have subscriptions registered. Delete subscriptions first!")
             return
         else:
             self.save_rssfeed(None, rssfeed_key=key, delete=True)
@@ -866,14 +882,10 @@ class GtkUI(Gtk3PluginBase):
         # Any subscriptions that use this message?
         if subscriptions_with_notification:
             subscription_titles = ''.join(["* %s\n" % title for title in subscriptions_with_notification])
-            md = Gtk.MessageDialog(component.get("Preferences").pref_dialog,
-                                   Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
-                                   Gtk.ButtonsType.CLOSE)
-            md.set_markup("This Email Message is used by the following subscriptions:\n<b>%s</b>"
-                          "You must first remove the notication from the subscriptions "
-                          "before deleting the email message!" % subscription_titles)
-            md.run()
-            md.destroy()
+            self.show_message_dialog(
+                "This Email Message is used by the following subscriptions:\n<b>%s</b>"
+                "You must first remove the notication from the subscriptions "
+                "before deleting the email message!" % subscription_titles)
             return
         # Delete from core config
         self.save_email_message(None, email_message_key=message_key, delete=True)

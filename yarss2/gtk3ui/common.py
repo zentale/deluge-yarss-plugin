@@ -35,3 +35,36 @@ def get_selected_combobox_key(combobox, index=0):
 def set_tooltip_markup(tooltip, markup):
     tooltip.set_markup(markup)
     return True
+
+
+def color_to_hex(color):
+    """
+    Convert color to html hex format
+
+    Args:
+        color (Gdk.RGBA, Gdk.Color): The color to convert
+
+    Returns:
+        str: The color in hex format
+
+    """
+    if isinstance(color, Gdk.RGBA):
+        color = color.to_color()
+    if isinstance(color, Gdk.Color):
+        floats = color.to_floats()
+    else:
+        return None
+
+    def float_to_int(float):
+        return int(float * 255)
+
+    rgb = tuple([float_to_int(float) for float in floats])
+    return '#%02x%02x%02x' % (rgb)
+
+
+def show_message_dialog(parent, msg):
+    md = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
+                           Gtk.ButtonsType.CLOSE, msg)
+    md.set_markup(msg)
+    md.run()
+    md.destroy()

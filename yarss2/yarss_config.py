@@ -24,7 +24,7 @@ except NameError:
     unicode = str
 
 
-LATEST_CONFIG_VERSION = 8
+LATEST_CONFIG_VERSION = 9
 DEFAULT_UPDATE_INTERVAL = 120
 
 DUMMY_RSSFEED_KEY = "9999"
@@ -171,6 +171,7 @@ class YARSSConfig(object):
         self.config.run_converter((5, 5), 6, self.update_config_to_version6)
         self.config.run_converter((6, 6), 7, self.update_config_to_version7)
         self.config.run_converter((7, 7), 8, self.update_config_to_version8)
+        self.config.run_converter((8, 8), 9, self.update_config_to_version9)
 
         default_config = get_fresh_subscription_config(key="")
         if self._insert_missing_dict_values(self.config["subscriptions"], default_config):
@@ -487,6 +488,18 @@ class YARSSConfig(object):
         self.run_for_each_dict_element(config["rssfeeds"], update_rssfeed)
         return config
 
+    def update_config_to_version9(self, config):
+        """Updates the config values to config file version (YaRSS2 v2.1.5)"""
+        self.log.info("Updating config file to version 9")
+        default_rssfeed_config = get_fresh_rssfeed_config()
+
+        def update_rssfeed(rssfeed):
+            # Adding new fields
+            rssfeed["use_cookies"] = default_rssfeed_config["use_cookies"]
+
+        self.run_for_each_dict_element(config["rssfeeds"], update_rssfeed)
+        return config
+
     def run_for_each_dict_element(self, conf_dict, update_func):
         for key in conf_dict.keys():
             update_func(conf_dict[key])
@@ -527,6 +540,7 @@ def get_fresh_rssfeed_config(name=u"", url=u"", site=u"", active=True, last_upda
     config_dict["obey_ttl"] = obey_ttl
     config_dict["user_agent"] = user_agent
     config_dict["prefer_magnet"] = False
+    config_dict["use_cookies"] = True
     if key:
         config_dict["key"] = key
     return config_dict

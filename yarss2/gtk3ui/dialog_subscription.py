@@ -19,12 +19,14 @@ from yarss2.util.common import (GeneralSubsConf, TorrentDownload, get_current_da
 from yarss2.yarss_config import get_user_agent
 
 from .CellRendererPango import CellRendererPango, CustomAttribute
+from .base import DialogBase
 from .common import Gdk, GdkPixbuf, Gtk, get_selected_combobox_key, set_tooltip_markup
 
 
-class DialogSubscriptionGUI(object):
+class DialogSubscriptionGUI(DialogBase):
 
     def __init__(self, editing=False, new_subscription=False):
+        super().__init__("dialog_subscription.ui", "dialog_subscription")
         self.editing = editing
         self.new_subscription = new_subscription
         self.matching_store = None
@@ -33,8 +35,7 @@ class DialogSubscriptionGUI(object):
         self.labels = None
 
     def setup_gui(self):
-        self.glade = Gtk.Builder.new_from_file(get_resource("dialog_subscription.ui"))
-        self.glade.connect_signals({
+        self.builder.connect_signals({
             "on_txt_regex_include_changed": self.on_txt_regex_changed,
             "on_txt_regex_exclude_changed": self.on_txt_regex_changed,
             "on_check_regex_include_toggled": self.on_txt_regex_changed,
@@ -52,12 +53,11 @@ class DialogSubscriptionGUI(object):
             "on_key_pressed": self.on_key_pressed,
             "on_textview_custom_text_move_cursor": lambda x, y: x,
             "on_panel_matching_move_handle": lambda x, y: x,
-            "on_dialog_subscription_response": self.on_dialog_subscription_response_signal,
+            "on_dialog_subscription_response": self.on_dialog_response,
             "on_txt_filter_include_query_tooltip": self.on_txt_filter_include_query_tooltip,
             "on_txt_filter_exclude_query_tooltip": self.on_txt_filter_exclude_query_tooltip,
         })
 
-        self.dialog = self.get_object("dialog_subscription")
         self.dialog.set_title("Edit Subscription" if self.editing else "Add Subscription")
 
         self.setup_rssfeed_combobox()
@@ -69,17 +69,10 @@ class DialogSubscriptionGUI(object):
         self.setup_labels()
         self.set_custom_text_tooltip()
 
-    def get_object(self, name):
-        return self.glade.get_object(name)
-
-    def on_dialog_subscription_response_signal(self, widget, arg):
-        # Escape key or close button (X in corner)
-        if arg == -4:
-            self.destroy()
-
     def destroy(self):
         component.get("Preferences").pref_dialog.set_modal(True)
-        self.dialog.destroy()
+        super().destroy()
+        self.gtkUI.subscription_dialog_closed(self.subscription_data.get('key', None))
 
     def show_dialog(self):
         pref_dialog = component.get("Preferences").pref_dialog
@@ -147,19 +140,18 @@ class DialogSubscriptionGUI(object):
         renderer_text = Gtk.CellRendererText()
         messages_combobox.pack_start(renderer_text, False)
         messages_combobox.add_attribute(renderer_text, "text", 1)
-
         # key, name
         self.messages_combo_store = Gtk.ListStore(str, str)
         messages_combobox.set_model(self.messages_combo_store)
 
     def setup_messages_list(self):
-        # message_key, message_title, active, torrent_added, torrent_completed,
+        # message_key, message_title, active, torrent_added, torrent_completed
         self.messages_list_store = Gtk.ListStore(str, str, bool, bool, bool)
         self.messages_treeview = Gtk.TreeView(model=self.messages_list_store)
         self.messages_treeview.connect("row-activated", self.on_notification_list_clicked)
         self.columns_dict = {}
 
-        def cell_data_func(tree_column, cell, model, tree_iter):
+        def cell_data_func(tree_column, cell, model, tree_iter, *args):
             if model.get_value(tree_iter, 2) is True:
                 pixbuf = self.icon_matching
             else:
@@ -375,6 +367,9 @@ class DialogSubscriptionGUI(object):
                 return
 
     def on_button_add_notication_clicked(self, button):
+        self.add_notication()
+
+    def add_notication(self):
         combobox = self.get_object("combobox_messages")
         key = get_selected_combobox_key(combobox)
         if key is None:
@@ -425,10 +420,7 @@ class DialogSubscriptionGUI(object):
         self.get_object("txt_last_matched").set_text(get_current_date_in_isoformat())
 
     def show_rssfeed_mandatory_message(self):
-        md = Gtk.MessageDialog(self.dialog, Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
-                               Gtk.ButtonsType.CLOSE, "You must select an RSS Feed")
-        md.run()
-        md.destroy()
+        self.show_message_dialog("You must select an RSS Feed")
 
     def on_button_cancel_clicked(self, event=None):
         self.destroy()

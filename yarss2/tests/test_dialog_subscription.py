@@ -365,3 +365,34 @@ class DialogSubscriptionTestCase(ComponentTestBase):
         torrent_link = "http://rarbg.to/rss_rt.php?id=k2jae9rlwn&m=t"
         success = yield subscription_dialog.add_torrent(torrent_link, None)
         self.assertFalse(success)
+
+    def test_save_subscription_with_label(self):
+        subscription_title = "Test subscription"
+        config = self.get_test_config()
+        testcase = self
+
+        class TestGTKUI(unittest.TestCase, TestGTKUIBase):
+
+            def __init__(self):
+                TestGTKUIBase.__init__(self)
+                self.labels = ["Test_label"]
+
+            def save_subscription(self, subscription_data):
+                testcase.assertEquals(subscription_data["label"], self.labels[0])
+
+        subscription_config = yarss_config.get_fresh_subscription_config()
+        subscription_dialog = DialogSubscription(TestGTKUI(),  # GTKUI
+                                                 self.log,  # logger
+                                                 subscription_config,
+                                                 config["rssfeeds"],
+                                                 {},  # self.email_messages,
+                                                 {})  # self.cookies)
+        with mock.patch.object(subscription_dialog, 'get_rssfeed_parsed') as mocked_func:
+            mocked_func.return_value = defer.succeed(None)
+            subscription_dialog.setup()
+            subscription_dialog.glade.get_object("txt_name").set_text(subscription_title)
+
+            # Sets the index 0 of rssfeed combox activated.
+            rssfeeds_combobox = subscription_dialog.glade.get_object("combobox_rssfeeds")
+            rssfeeds_combobox.set_active(0)
+            return threads.deferToThread(subscription_dialog.save_subscription_data)

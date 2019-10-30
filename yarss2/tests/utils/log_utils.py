@@ -74,7 +74,8 @@ def setup_tests_loggers(yarss2_tests_log_level_str, yarss2_log_level_str, deluge
         deluge_log_level = get_level(deluge_log_level_str)
 
     root = logging.getLogger()
-    root.setLevel(logging.DEBUG)
+    #root.setLevel(logging.DEBUG)
+    root.setLevel(logging.INFO)
 
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.set_name(logging_console_handler_name)

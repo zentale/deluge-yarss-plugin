@@ -163,7 +163,7 @@
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">0</property>
-                        <property name="width">2</property>
+                        <property name="width">3</property>
                       </packing>
                     </child>
                     <child>
@@ -177,7 +177,7 @@
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">1</property>
-                        <property name="width">2</property>
+                        <property name="width">3</property>
                       </packing>
                     </child>
                     <child>
@@ -185,6 +185,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
                         <property name="invisible_char">●</property>
                         <property name="width_chars">10</property>
                         <property name="text" translatable="yes">120</property>
@@ -196,6 +197,7 @@
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">2</property>
+                        <property name="width">2</property>
                       </packing>
                     </child>
                     <child>
@@ -217,15 +219,19 @@
                     <child>
                       <object class="GtkEntry" id="txt_cookies">
                         <property name="visible">True</property>
-                        <property name="sensitive">False</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
                         <property name="editable">False</property>
                         <property name="invisible_char">•</property>
-                        <property name="shadow_type">none</property>
+                        <property name="shadow_type">etched-in</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
                         <signal name="query-tooltip" handler="on_txt_cookies_query_tooltip" swapped="no"/>
+                        <style>
+                          <class name="txt_cookies_entry"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -255,13 +261,38 @@
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="has_tooltip">True</property>
+                        <property name="halign">start</property>
+                        <property name="valign">center</property>
+                        <property name="margin_left">5</property>
+                        <property name="resize_mode">queue</property>
                         <property name="draw_indicator">True</property>
                         <signal name="query-tooltip" handler="on_checkbox_run_on_startup_query_tooltip" swapped="no"/>
                       </object>
                       <packing>
-                        <property name="left_attach">2</property>
+                        <property name="left_attach">3</property>
                         <property name="top_attach">2</property>
                       </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="checkbutton_use_cookies">
+                        <property name="label" translatable="yes">Use cookies</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="halign">start</property>
+                        <property name="valign">center</property>
+                        <property name="margin_left">5</property>
+                        <property name="resize_mode">queue</property>
+                        <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_checkbox_use_cookies_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="left_attach">3</property>
+                        <property name="top_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                     <child>
                       <placeholder/>

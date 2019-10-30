@@ -8,6 +8,8 @@
 #
 import datetime
 
+from twisted.trial import unittest
+
 import yarss2.util.common
 from yarss2 import rssfeed_handling
 from yarss2.util import common, logging
@@ -20,7 +22,7 @@ from .utils.log_utils import plugin_tests_logger_name
 log = logging.getLogger(plugin_tests_logger_name)
 
 
-class RSSFeedHandlingTestCase(TestCaseDebug):
+class RSSFeedHandlingTestCase(unittest.TestCase, TestCaseDebug):
 
     def setUp(self):  # NOQA
         self.log = log
@@ -30,7 +32,7 @@ class RSSFeedHandlingTestCase(TestCaseDebug):
     def test_get_rssfeed_parsed(self):
         file_url = yarss2.util.common.get_resource(test_common.testdata_rssfeed_filename, path="tests/")
         rssfeed_data = {"name": "Test", "url": file_url, "site:": "only used whith cookie arguments",
-                        "prefer_magnet": False}
+                        "prefer_magnet": False, "use_cookies": True}
         site_cookies = {"uid": "18463", "passkey": "b830f87d023037f9393749s932"}
         user_agent = "User_agent_test"
         parsed_feed = self.rssfeedhandler.get_rssfeed_parsed(rssfeed_data, site_cookies_dict=site_cookies,
@@ -48,11 +50,30 @@ class RSSFeedHandlingTestCase(TestCaseDebug):
                           ['passkey=b830f87d023037f9393749s932', 'uid=18463'])
         self.assertEquals(parsed_feed["user_agent"], user_agent)
 
+    def test_get_rssfeed_parsed_do_not_use_cookies(self):
+        file_url = yarss2.util.common.get_resource(test_common.testdata_rssfeed_filename, path="tests/")
+        rssfeed_data = {"name": "Test", "url": file_url, "site:": "only used whith cookie arguments",
+                        "prefer_magnet": False, "use_cookies": False}
+        site_cookies = {"uid": "18463", "passkey": "b830f87d023037f9393749s932"}
+        user_agent = "User_agent_test"
+        parsed_feed = self.rssfeedhandler.get_rssfeed_parsed(rssfeed_data, site_cookies_dict=site_cookies,
+                                                             user_agent=user_agent)
+
+        # When needing to dump the result in json format
+        # common.json_dump(parsed_feed["items"], "freebsd_rss_items_dump2.json")
+
+        self.assertTrue("items" in parsed_feed)
+        items = parsed_feed["items"]
+        stored_items = test_common.load_json_testdata()
+
+        assert_equal(items, stored_items)
+        self.assertNotIn("cookie_header", parsed_feed)
+
     def test_get_rssfeed_showrss(self):
         filename = "showrss.xml"
         file_url = yarss2.util.common.get_resource(filename, path="tests/data/feeds")
         rssfeed_data = {"name": "Test", "url": file_url, "site:": "only used whith cookie arguments",
-                        "prefer_magnet": True}
+                        "prefer_magnet": True, "use_cookies": False}
         parsed_feed = self.rssfeedhandler.get_rssfeed_parsed(rssfeed_data)
 
         # When needing to dump the result in json format
@@ -78,7 +99,7 @@ class RSSFeedHandlingTestCase(TestCaseDebug):
         file_url = yarss2.util.common.get_resource(filename, path="tests/data/feeds")
 
         rssfeed_data = {"name": "Test", "url": file_url, "site:": "only used whith cookie arguments",
-                        "prefer_magnet": True}
+                        "prefer_magnet": True, "use_cookies": True}
         site_cookies = {"uid": "18463", "passkey": "b830f87d023037f9393749s932"}
         user_agent = "User_agent_test"
         parsed_feed = self.rssfeedhandler.get_rssfeed_parsed(rssfeed_data, site_cookies_dict=site_cookies,

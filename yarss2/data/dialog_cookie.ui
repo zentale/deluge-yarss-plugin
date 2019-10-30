@@ -5,6 +5,7 @@
   <object class="GtkDialog" id="dialog_cookie">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
+    <property name="modal">True</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
     <signal name="response" handler="on_dialog_cookies_response" swapped="no"/>
@@ -96,25 +97,11 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="halign">start</property>
+                        <signal name="query-tooltip" handler="on_txt_site_url_query_tooltip" swapped="no"/>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="button_remove_cookie_data">
-                        <property name="label" translatable="yes">Delete selected</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="halign">center</property>
-                        <signal name="clicked" handler="on_button_remove_cookie_data_clicked" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="top_attach">0</property>
-                        <property name="width">2</property>
                       </packing>
                     </child>
                     <child>
@@ -140,20 +127,6 @@
                                 <property name="can_focus">False</property>
                                 <property name="row_spacing">5</property>
                                 <property name="column_spacing">4</property>
-                                <child>
-                                  <object class="GtkButton" id="button_add_cookie_data">
-                                    <property name="label" translatable="yes">Add Cookie Data</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
-                                    <signal name="clicked" handler="on_button_add_cookie_data_clicked" swapped="no"/>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">0</property>
-                                    <property name="top_attach">0</property>
-                                    <property name="width">2</property>
-                                  </packing>
-                                </child>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -195,6 +168,50 @@
                                     <property name="left_attach">1</property>
                                     <property name="top_attach">2</property>
                                   </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="spacing">5</property>
+                                    <child>
+                                      <object class="GtkButton" id="button_add_cookie_data">
+                                        <property name="label" translatable="yes">Add Cookie Data</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <signal name="clicked" handler="on_button_add_cookie_data_clicked" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="button_remove_cookie_data">
+                                        <property name="label" translatable="yes">Delete selected</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="halign">center</property>
+                                        <signal name="clicked" handler="on_button_remove_cookie_data_clicked" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">3</property>
+                                    <property name="width">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
                                 </child>
                               </object>
                             </child>
@@ -250,9 +267,9 @@
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
-                        <property name="top_attach">1</property>
+                        <property name="top_attach">0</property>
                         <property name="width">2</property>
-                        <property name="height">4</property>
+                        <property name="height">5</property>
                       </packing>
                     </child>
                   </object>

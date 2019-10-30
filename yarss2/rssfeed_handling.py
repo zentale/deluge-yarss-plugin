@@ -172,7 +172,7 @@ class RSSFeedHandler(object):
         cookie_header = {}
         return_dict["user_agent"] = user_agent
 
-        if site_cookies_dict:
+        if site_cookies_dict and rssfeed_data["use_cookies"]:
             cookie_header = http.get_cookie_header(site_cookies_dict)
             return_dict["cookie_header"] = cookie_header
 
