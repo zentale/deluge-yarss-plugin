@@ -41,7 +41,13 @@ except ImportError:
     base64 = binascii = None
 else:
     # Python 3.1 deprecated decodestring in favor of decodebytes
-    _base64decode = getattr(base64, 'decodebytes', base64.decodestring)
+    #_base64decode = getattr(base64, 'decodebytes', base64.decodestring)
+    # Above fix is broken in python 3.9 when decodestring was removed
+    try:
+        _base64decode= base64.decodestring
+    except:
+        _base64decode = base64.decodebytes
+
 
 from .datetimes import _parse_date
 from .urls import _convert_to_idn

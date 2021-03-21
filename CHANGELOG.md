@@ -1,10 +1,14 @@
 ## Changelog ##
 
+v2.1.5 - 2021-03-21
+
+* Fix #64: Fix error on python 3.9 due to bug in feedparser
+
 v2.1.4 - 2019-10-23
 
-    * Fix #53: Fix bug introduced in v2.1.2 where showing the RSS feed results was
-               broken in thin client mode.
-    * Fix #48: Reduce the minimum updating interval from 5 to 1 minute.
+* Fix #53: Fix bug introduced in v2.1.2 where showing the RSS feed results was
+           broken in thin client mode.
+* Fix #48: Reduce the minimum updating interval from 5 to 1 minute.
 
 v2.1.3 - 2019-10-17
 
