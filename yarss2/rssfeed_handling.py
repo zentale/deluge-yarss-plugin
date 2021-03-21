@@ -287,9 +287,9 @@ class RSSFeedHandler(object):
             if not type(options["custom_text_lines"]) is list:
                 self.log.warning("type of custom_text_lines' must be list")
             else:
-                for l in options["custom_text_lines"]:
+                for line in options["custom_text_lines"]:
                     key = common.get_new_dict_key(rssfeed_parsed, string_key=False)
-                    rssfeed_parsed[key] = self._new_rssfeeds_dict_item(l, key=key)
+                    rssfeed_parsed[key] = self._new_rssfeeds_dict_item(line, key=key)
 
         if options["regex_include"] is not None and options["regex_include"] != "":
             flags = re.IGNORECASE if options["regex_include_ignorecase"] else 0

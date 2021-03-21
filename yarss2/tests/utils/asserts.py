@@ -4,8 +4,8 @@ from .assert_funcs import assert_almost_equal, assert_equal
 
 
 def _get_lists_diff(l1, l2):
-    def get_list_str(l):
-        return "[\n%s\n]" % ("\n".join([line for line in l]))
+    def get_list_str(lines):
+        return "[\n%s\n]" % ("\n".join([line for line in lines]))
 
     diff = ('\n' + '\n'.join(difflib.ndiff(
         get_list_str(l1).splitlines(),
