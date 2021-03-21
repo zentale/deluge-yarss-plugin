@@ -10,7 +10,8 @@ import re
 
 import attr
 
-from yarss2.error import FetchAndFeedparsingError
+from deluge.error import DelugeError
+
 from yarss2.util import common, http
 from yarss2.yarss_config import get_user_agent
 
@@ -188,7 +189,7 @@ class RSSFeedHandler(object):
             self.log.warning("Feedparser was called with url: '%s' using cookies: '%s' and User-agent: '%s'" %
                              (rssfeed_data["url"], http.get_cookie_header(cookie_header), user_agent))
             self.log.warning("Stacktrace:\n" + common.get_exception_string())
-            raise FetchAndFeedparsingError("Exception occured in feedparser: " + str(e))
+            raise DelugeError("Exception occured in feedparser: " + str(e))
 
         return_dict["raw_result"] = parsed_feed
 
