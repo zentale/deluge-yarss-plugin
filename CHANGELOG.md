@@ -2,7 +2,7 @@
 
 v2.1.5 - 2021-03-21
 
-* Fix #64: Fix error on python 3.9 due to bug in feedparser
+* Fix #63: Fix error on python 3.9 due to bug in feedparser
 
 v2.1.4 - 2019-10-23
 
