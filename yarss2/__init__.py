@@ -62,6 +62,6 @@ class Gtk3UIPlugin(PluginInitBase):
 
 class WebUIPlugin(PluginInitBase):
     def __init__(self, plugin_name):
-        from .webui import YaRSS2 as _pluginCls
+        from .webui import WebUI as _pluginCls
         self._plugin_cls = _pluginCls
         super(WebUIPlugin, self).__init__(plugin_name)
